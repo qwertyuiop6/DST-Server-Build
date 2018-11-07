@@ -83,7 +83,7 @@ return {
   
         -- MONSTERS
         spiders = "default",
-        cave_spiders = "rare",
+        cave_spiders = "default",
         hounds = "default",
         houndmound = "default",
         merm = "default",
@@ -98,9 +98,9 @@ return {
         deerclops = "default",
         goosemoose = "default",
         dragonfly = "default",
-        bats = "rare",
+        bats = "default",
         fissure = "default",
-        worms = "rare",
+        worms = "default",
         wormattacks="rare",
     },
 }
