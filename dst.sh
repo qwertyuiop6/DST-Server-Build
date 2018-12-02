@@ -76,34 +76,41 @@ updst(){
 }
 
 main(){
+
+	echo -e "\033[42;30m ### what do you want to do? ### \033[0m"
+	echo -e "\033[32m 0. \033[0m start master and cave server"
+	echo -e "\033[32m 1. \033[0m only start master server"
+	echo -e "\033[32m 2. \033[0m only start cave server"
+	echo -e "\033[32m 3. \033[0m stop running server"
+	echo -e "\033[32m 4. \033[0m delete server's saved file"                                                                                                 
+	echo -e "\033[32m 5. \033[0m restart dst server"
+	echo -e "\033[32m 6. \033[0m update dst game"
+
 	read -p "Input your choose number: " choose
-	if [[ $choose -gt 0 ]]; then
+	# if [[ $choose -gt 0 ]]; then
 		case $choose in
 			0 ) go
 				;;
 			1 ) goMaster
 				;;
-			2 ) stop
+			2 ) goCaves
 				;;
-			3 ) del
+			3 ) stop
 				;;
-			4 ) reset
+			4 ) del
 				;;
-			5 ) updst
+			5 ) reset
+				;;
+			6 ) updst
+				;;
+			* ) echo -e "\033[31mPlease enter the number before the following options!! \033[0m"
+				main
 				;;
 		esac
-	else
-		echo "\033[31m please input the number of underlines! \033[0m"
-		main
-	fi
+	# else
+	# 	echo "\033[31m please input the number of underlines! \033[0m"
+	# 	main
+	# fi
 }
-
-echo -e "\033[42;30m ### what are you want to do? ### \033[0m"
-echo -e "\033[32m 0. \033[0m start master and cave server"
-echo -e "\033[32m 1. \033[0m only start master server"
-echo -e "\033[32m 2. \033[0m stop running server"
-echo -e "\033[32m 3. \033[0m delete server's saved file"                                                                                                 
-echo -e "\033[32m 4. \033[0m restart dst server"
-echo -e "\033[32m 5. \033[0m update dst game"
 
 main
