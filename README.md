@@ -17,7 +17,8 @@
 
 ## DST Server 快速搭建
 
-> git clone https://github.com/qwertyuiop6/DST-Server-Build
+> git clone git@github.com:qwertyuiop6/DST-Server-Build.git
+
 > cd DST-Server-Build&&sudo chmod +x dst-go.sh&&./dst-go.sh
 
 ## DST Server 日常管理命令
