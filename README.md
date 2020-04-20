@@ -21,13 +21,11 @@
 
 > cd DST-Server-Build&&sudo chmod +x dst-go.sh&&./dst-go.sh
 
-## DST Server 日常管理命令
+## DST Server 日常管理命令 
 
-### Usage 
-
-> 1. 直接输入 dst
-
-> 2. 输入 sh ~/DST-Server-Build/dst-admin.sh:
+> 直接输入 dst
+或:
+> sh ~/DST-Server-Build/dst-admin.sh:
 
 - 0 : 查看游戏服务器状态
 - 1 : 启动地上+洞穴游戏进程
