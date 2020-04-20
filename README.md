@@ -1,11 +1,4 @@
-简单快速搭建饥荒游戏server
-
-## How Build
-
-### My article
-
-> DST-Server 饥荒服务搭建详细小白教程:
-> [Click me](https://wtfk.world/2017/11/02/my-first-article/)
+## 简单快速搭建饥荒游戏server
 
 ### SteamCMD Usage
 
@@ -17,13 +10,23 @@
 
 [Klei guide2](http://steamcommunity.com/sharedfiles/filedetails/?id=590565473)
 
-## DST Server Admin By Shell Script
+### My article
 
-附带一个简单好用的shell脚本管理你的饥荒server
+> DST-Server 饥荒服务搭建详细小白教程:
+> [Click me](https://wtfk.world/2017/11/02/my-first-article/)
+
+## DST Server 快速搭建
+
+> git clone https://github.com/qwertyuiop6/DST-Server-Build
+> cd DST-Server-Build&&sudo chmod +x dst-go.sh&&./dst-go.sh
+
+## DST Server 日常管理命令
 
 ### Usage 
 
-> sh dst.sh  or  ./dst.sh:
+> 1. 直接输入 dst
+
+> 2. 输入 sh ~/DST-Server-Build/dst-admin.sh:
 
 - 0 : 查看游戏服务器状态
 - 1 : 启动地上+洞穴游戏进程

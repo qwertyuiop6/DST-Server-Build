@@ -1,3 +1,6 @@
+--地上mod配置文件
+--workshop-id对应 mod的id
+--true 开启, false关闭
 return {
 ["workshop-375859599"] = { enabled = false },--healh info
 ["workshop-841471368"] = { enabled = true },--fangxiongsuo!!!
@@ -7,6 +10,3 @@ return {
 ["workshop-666155465"] = { enabled = true },--Show Me
 ["workshop-367546858"] = {enabled = true} --chinese
 }
-
-
-

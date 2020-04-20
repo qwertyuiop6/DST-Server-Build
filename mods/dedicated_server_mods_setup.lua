@@ -1,6 +1,8 @@
-  --第一种是安装单独mod
+----------------------我是服务器mod安装哪些的配置文件---------------------------
+  --服务器安装mod方法:
+  --1.安装单独mod
   --ServerModSetup("mod的id")
-  --第二种是安装mod合集
+  --2.安装mod合集
   --ServerModCollectionSetup("合集的id")
 
 --下面推荐几个常用的mod   
@@ -12,4 +14,4 @@ ServerModSetup("367546858") --服务端中文
 ServerModSetup("841471368") --防熊锁
 ServerModSetup("378160973") --全图定位
  
---饥荒的mod id查看：浏览器打开创意工坊任意要下载的mod页面，url处会有id=xxxxxxxx
+--怎么获得饥荒mod的id???? ----> 浏览器打开创意工坊任意要下载的mod页面，url链接处会有id=xxxxxxxx

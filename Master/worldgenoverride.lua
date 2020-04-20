@@ -1,8 +1,9 @@
+--地上 地图属性配置文件
 return {
     override_enabled = true,
     preset = "SURVIVAL_TOGETHER",       -- "SURVIVAL_TOGETHER", "MOD_MISSING", "SURVIVAL_TOGETHER_CLASSIC", "SURVIVAL_DEFAULT_PLUS", "COMPLETE_DARKNESS", "DST_CAVE", "DST_CAVE_PLUS"
     overrides = {
-        -- default is "never", "rare", "default", "often", "always"
+        -- defalut(默认) 可改为 "never", "rare", "default", "often", "always"
 
         -- MISC
         task_set = "default",           -- "classic", "default", "cave_default"
@@ -28,7 +29,7 @@ return {
         prefabswaps_start = "default",  -- "classic", "default", "highly random"
         prefabswaps = "default",        -- "none", "few", "default", "many", "max"
         disease_delay="none",
-        specialevent = "winters_feast", 
+        specialevent = "winters_feast", -- "winters_feast","year_of_the_varg"
 
         -- RESOURCES
         flowers = "default",
