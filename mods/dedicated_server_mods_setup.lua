@@ -11,7 +11,8 @@ ServerModSetup("375859599") --health info
 ServerModSetup("780009141") --物品箱子提示
 ServerModSetup("462434129") --restart
 ServerModSetup("367546858") --服务端中文
-ServerModSetup("841471368") --防熊锁
+-- ServerModSetup("841471368") --防熊锁
+ServerModSetup("1714227968") --新版防熊
 ServerModSetup("378160973") --全图定位
  
 --怎么获得饥荒mod的id???? ----> 浏览器打开创意工坊任意要下载的mod页面，url链接处会有id=xxxxxxxx
