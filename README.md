@@ -19,6 +19,12 @@
 
 > git clone git@github.com:qwertyuiop6/DST-Server-Build.git
 
+或者
+
+> apt install unzip -y&&wget https://github.com/qwertyuiop6/DST-Server-Build/archive/master.zip&&unzip master.zip&&mv DST-Server-Build-master DST-Server-Build
+
+然后
+
 > cd DST-Server-Build&&sudo chmod +x dst-go.sh&&./dst-go.sh
 
 ## DST Server 日常管理命令 
