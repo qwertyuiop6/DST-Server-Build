@@ -1,4 +1,4 @@
-## 简单快速搭建饥荒游戏server
+## 搭建饥荒游戏server
 
 ### SteamCMD Usage
 
@@ -17,11 +17,14 @@
 
 ## DST Server 快速搭建
 
+使用git
+
 > git clone git@github.com:qwertyuiop6/DST-Server-Build.git
 
 或者
 
 > sudo apt install unzip -y&&wget https://github.com/qwertyuiop6/DST-Server-Build/archive/master.zip
+
 > unzip master.zip&&mv DST-Server-Build-master DST-Server-Build
 
 然后
@@ -30,7 +33,7 @@
 
 ## DST Server 日常管理命令 
 
-> 直接输入 dst
+> 直接使用 dst 命令
 或:
 > sh ~/DST-Server-Build/dst-admin.sh:
 
