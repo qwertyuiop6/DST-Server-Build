@@ -24,17 +24,11 @@ cd ~/dst/bin
 echo ./dontstarve_dedicated_server_nullrenderer -console -cluster MyDediServer -shard Master > overworld.sh
 echo ./dontstarve_dedicated_server_nullrenderer -console -cluster MyDediServer -shard Caves > cave.sh
 
-#创建饥荒server主配置+数据文件夹
-mkdir -p ~/.klei/DoNotStarveTogether/MyDediServer
-# cd ~
-
-#提示语
-if [[ `echo $?` -eq 0 ]]; then
-	echo -e "\033[42;30m ### 游戏服务器初始化完成... \033[0m"
-else
-	echo -e "\033[31m 执行出现了错误，可能因为网络不好，请尝试重新执行一次 \033[0m"	
-fi
-
+# if [[ `echo $?` -eq 0 ]]; then
+# 	echo -e "\033[42;30m ### 游戏服务器初始化完成... \033[0m"
+# else
+# 	echo -e "\033[31m 执行出现了错误，可能因为网络不好，请尝试重新执行一次 \033[0m"	
+# fi
 
 cd ~/DST-Server-Build
 
@@ -42,6 +36,9 @@ cd ~/DST-Server-Build
 sudo chmod +x dst-admin.sh
 #添加命令链接到系统路径
 sudo ln dst-admin.sh /usr/local/bin/dst
+
+#创建饥荒server主配置+数据文件夹
+mkdir -p ~/.klei/DoNotStarveTogether/MyDediServer
 
 #复制服饥荒务器配置文件
 cp {cluster_token.txt,cluster.ini} ~/.klei/DoNotStarveTogether/MyDediServer
