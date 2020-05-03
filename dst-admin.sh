@@ -1,7 +1,7 @@
 #!/bin/bash
 
-master="$HOME/.klei/DoNotStarveTogether/MyDediServer/Master/"
-cave="$HOME/.klei/DoNotStarveTogether/MyDediServer/Caves/"
+master="$HOME/.klei/DoNotStarveTogether/MyDediServer/Master"
+cave="$HOME/.klei/DoNotStarveTogether/MyDediServer/Caves"
 
 dst_dir=(${master} ${cave})
 dst_name=("Master" "Caves")
@@ -20,7 +20,7 @@ status(){
 #　启动
 start(){
     cd ~/dst/bin
-    # dst=${dst_dir[$1]}
+
     if [[ -z `ps -ef | grep -v grep |grep -v "dst.sh"|grep ${dst_name[$1]}|sed -n '1P'|awk '{print $2}'` ]]; then
 		screen -dm sh ${dst_sh[$1]}.sh && if [[ `echo $?` -eq 0 ]]; 
 		then
@@ -33,8 +33,13 @@ start(){
 
 # 停止
 stop(){
-	ps -ef | grep -v grep |grep ${dst_name[$1]}|awk '{print $2}'|xargs kill -9
-	if [[ -z `ps -ef | grep -v grep |grep -v "dst.sh"|grep ${dst_name[$1]}|sed -n '1P'|awk '{print $2}'` ]]; then
+
+	pid=`ps -ef | grep -v grep |grep -v "dst.sh"|grep ${dst_name[$1]}|sed -n '1P'|awk '{print $2}'`
+
+	if [[ -z $pid ]]; then
+		echo  -e "\033[32m ${dst_zh[$1]}状态:关闭 \033[0m"
+	else
+		kill -9 $pid
 		echo  -e "\033[32m ##: ${dst_zh[$1]}已停止... \033[0m"
 	fi
 }
@@ -57,10 +62,10 @@ del(){
 
 	dir=${dst_dir[$1]}
 
-	if test -d ${dir}"save"
+	if test -d ${dir}/save
 	then
 		# rm -r ${dir}"save"&&rm -r `find ${dir} -name "*.txt"` && rm -r ${dir}"backup"
-		rm -r ${dir}"save"
+		rm -r ${dir}/{save,backup}
 		echo -e "\033[32m ##: ${dst_zh[$1]}文件删除完毕~ \033[0m"
 	fi
 }
