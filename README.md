@@ -27,9 +27,8 @@ git clone git@github.com:qwertyuiop6/DST-Server-Build.git
 - 或者 使用http下载
 ```shell
 sudo apt install unzip -y&&wget https://github.com/qwertyuiop6/DST-Server-Build/archive/master.zip
-```
-```shell
-unzip master.zip&&mv DST-Server-Build-master DST-Server-Build
+
+unzip master.zip&&mv DST-Server-Build-master DST-Server-Build&&rm master.zip
 ```
 #### 2. 赋权并运行
 ```shell

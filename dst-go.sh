@@ -51,6 +51,14 @@ cp {cluster_token.txt,cluster.ini} ~/.klei/DoNotStarveTogether/MyDediServer
 cp -r {Master,Caves} ~/.klei/DoNotStarveTogether/MyDediServer
 cp -r mods ~/dst
 
+#path
+
+#link
+ln ~/.klei/DoNotStarveTogether/MyDediServer/Master/modoverrides.lua ~/.klei/DoNotStarveTogether/MyDediServer/Caves/modoverrides.lua -b
+ln -s ~/.klei/DoNotStarveTogether/MyDediServer/Master/modoverrides.lua ./mods_enable.lua
+ln -s ~/dst/mods/dedicated_server_mods_setup.lua ./mods_setup.lua
+
+
 echo -en "\033[32m请输入您的私人饥荒token,回车确认:\033[0m"
 read token
 echo $token > ~/.klei/DoNotStarveTogether/MyDediServer/cluster_token.txt
