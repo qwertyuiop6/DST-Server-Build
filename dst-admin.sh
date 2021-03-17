@@ -85,15 +85,17 @@ updst(){
 		stop 1
 	fi
 
-	cp ~/dst/mods/dedicated_server_mods_setup.lua ~/dsms.lua.bak
+	modlink="$HOME/.klei/DoNotStarveTogether/MyDediServer/mods_setup.lua"
+	modlua="$HOME/dst/mods/dedicated_server_mods_setup.lua"
 	
+	[ -f $modlink ]||ln $modlua $modlink
+
 	~/steamcmd/steamcmd.sh +login anonymous +force_install_dir ~/dst +app_update 343050 validate +quit
-	
 	if [[ `echo $?` -eq 0 ]]; then
 		echo -e "\033[46;37m ##: 饥荒游戏版本更新成功~ \033[0m"
 	fi
 
-	cp ~/dsms.lua.bak ~/dst/mods/dedicated_server_mods_setup.lua
+	ln -f $modlink $modlua
 }
 
 main(){
