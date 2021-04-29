@@ -46,17 +46,19 @@ sudo chmod +x dst-admin.sh dst-v.sh
 sudo ln dst-admin.sh /usr/local/bin/dst
 sudo ln dst-v.sh /usr/local/bin/dst-v
 
+DST="$HOME/.klei/DoNotStarveTogether/MyDediServer"
+
 #复制服饥荒务器配置文件
-cp {cluster_token.txt,cluster.ini} ~/.klei/DoNotStarveTogether/MyDediServer
-cp -r {Master,Caves} ~/.klei/DoNotStarveTogether/MyDediServer
+cp {cluster_token.txt,cluster.ini} $DST
+cp -r {Master,Caves} $DST
 cp -r mods ~/dst
 
 #path
 
 #link
-ln ~/.klei/DoNotStarveTogether/MyDediServer/Master/modoverrides.lua ~/.klei/DoNotStarveTogether/MyDediServer/Caves/modoverrides.lua -b
-ln -s ~/.klei/DoNotStarveTogether/MyDediServer/Master/modoverrides.lua ./mods_enable.lua
-ln -s ~/dst/mods/dedicated_server_mods_setup.lua ./mods_setup.lua
+ln $DST/Master/modoverrides.lua $DST/Caves/modoverrides.lua -b
+ln $DST/Master/modoverrides.lua $DST/mods_enable.lua
+ln ~/dst/mods/dedicated_server_mods_setup.lua $DST/mods_setup.lua
 
 
 echo -en "\033[32m请输入您的私人饥荒token,回车确认:\033[0m"
@@ -64,4 +66,4 @@ read token
 echo $token > ~/.klei/DoNotStarveTogether/MyDediServer/cluster_token.txt
 
 echo -e "\033[32m### 请记住-->\033[34m dst \033[0m\033[32m<--这个命令,使用它可以便捷管理你的游戏服务器! \033[0m"
-echo -e "接下来你需要做的是:\n\033[32m1.修改游戏的各种配置文件(服务器信息设置,mod下载配置,mod启用配置,地图配置等)\033[0m\n\033[32m2.使用\033[34m dst \033[0m\033[32m命令来操作游戏服务器\033[0m"
+echo -e "接下来你需要做的是:\n\033[32m1.修改游戏的各种配置文件(服务器的信息配置,mod的下载,启用配置和地图配置等)\033[0m\n\033[32m2.使用\033[34m dst \033[0m\033[32m命令来操作游戏服务器\033[0m"
