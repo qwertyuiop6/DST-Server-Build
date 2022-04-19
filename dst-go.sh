@@ -1,23 +1,29 @@
 #!/bin/bash
 
 #安装必要的软件包
-sudo apt-get update
-sudo apt-get install lib32gcc1 libcurl4-gnutls-dev:i386 screen python3 python3-pip -y
+sudo add-apt-repository multiverse
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt-get install lib32gcc-s1 lib32gcc1 lib32stdc++6 libcurl3-gnutls:i386 libcurl4-gnutls-dev:i386 screen python3 python3-pip -y
 
 pip3 install requests lxml
 
+#安装steamcmd
+sudo apt install steamcmd 
+
 #创建steamcmd文件夹
-mkdir ~/steamcmd
-cd ~/steamcmd
+#mkdir ~/steamcmd
+#cd ~/steamcmd
 
 #下载steamcmd
-wget https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
-tar -xvzf steamcmd_linux.tar.gz
+#wget https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
+#tar -xvzf steamcmd_linux.tar.gz
 
 #登录steamcmd+安装饥荒服务端到~/dst
-./steamcmd.sh +login anonymous +force_install_dir ~/dst +app_update 343050 validate +quit
+steamcmd +force_install_dir ../../dst +login anonymous  +app_update 343050 validate +quit
+
 #修正一个经常出现的包缺失问题
-cp ~/steamcmd/linux32/libstdc++.so.6 ~/dst/bin/lib32/
+# cp ~/steamcmd/linux32/libstdc++.so.6 ~/dst/bin/lib32/
 
 #进入饥荒启动可执行文件入口
 cd ~/dst/bin
@@ -25,6 +31,8 @@ cd ~/dst/bin
 #分别为地上,洞穴建立快速启动的shell脚本
 echo ./dontstarve_dedicated_server_nullrenderer -console -cluster MyDediServer -shard Master > overworld.sh
 echo ./dontstarve_dedicated_server_nullrenderer -console -cluster MyDediServer -shard Caves > cave.sh
+
+chmod +x overworld.sh cave.sh
 
 #创建饥荒server主配置+数据文件夹
 mkdir -p ~/.klei/DoNotStarveTogether/MyDediServer

@@ -35,6 +35,7 @@ start(){
     if [[ ${dst_live[$1]} -eq 0 ]]; then
 		screen -S "DST_${dst_name[$1]}" -dm sh ${dst_sh[$1]}.sh && if [[ `echo $?` -eq 0 ]];
 		then
+			[ -f ${dst_dir[$1]}/chat.txt.tmp ]&&mv ${dst_dir[$1]}/chat.txt.tmp ${dst_dir[$1]}/server_chat_log.txt
 			echo -e "\e[36m ##: ${dst_zh[$1]}启动成功~ \e[0m"
 		fi
 	else
@@ -44,11 +45,10 @@ start(){
 
 # 停止
 stop(){
-
-	is_live=${dst_name[$1]}_live
 	if [[ ${dst_live[$1]} -gt 0 ]];then
 		screen -S DST_${dst_name[$1]} -p 0 -X stuff "c_shutdown()$(printf \\r)"
-		echo  -e "\e[32m ##: ${dst_zh[$1]}已停止... \e[0m"		
+		echo  -e "\e[32m ##: ${dst_zh[$1]}已停止... \e[0m"
+		cp ${dst_dir[$1]}/server_chat_log.txt ${dst_dir[$1]}/chat.txt.tmp		
 	else
 		echo  -e "\e[32m ${dst_zh[$1]}状态:关闭 \e[0m"
 	fi
@@ -61,21 +61,33 @@ restart(){
 
 # 重置
 reset(){
+	now=`date '+%Y-%m-%d'`
+	bak=${servers}/${now}.reset.bak
+	if [ ! -d $bak ];then
+		cp -r $cluster $bak
+		echo -e "\e[32m 存档文件已备份于:$bak \e[0m"
+	fi
+
 	del $1
 	start $1
+	# if [[ $Master_live > 0 ]]; then
+	#     screen -S "DST_Master" -p 0 -X stuff "c_regenerateworld()$(printf \\r)"
+	# fi
+	# if [[ $Caves_live > 0 ]]; then
+	#     screen -S "DST_Caves" -p 0 -X stuff "c_regenerateworld()$(printf \\r)"
+	# fi
+	# echo "\e[35m正在重置当前世界。。。请稍候。。。\e[0m"
 }
 
-#备份并删除当前存档
+#删除当前存档
 del(){
 	stop $1
 	dir=${dst_dir[$1]}
 
 	if test -d ${dir}/save
 	then
-		now=`date '+%Y-%m-%d'`
-		cp -r $cluster ${servers}/${now}.reset.bak
-		rm -r ${dir}/{save,backup}
-		echo -e "\e[32m ##: ${dst_zh[$1]}文件删除完毕~ \e[0m"
+		rm -r ${dir}/{save,backup,*.txt,*.tmp}
+		echo -e "\e[32m ##: ${dst_zh[$1]}存档文件删除完毕~ \e[0m"
 	fi
 }
 
@@ -110,7 +122,13 @@ updst(){
 	fi
 
 	ln -f $modlink $modlua
-	mv $dir/chat.txt.tmp $dir/server_chat_log.txt
+
+	if [ $1 ];then
+		start $1
+	else
+		start 0
+		start 1
+	fi
 }
 
 #回档
@@ -151,19 +169,6 @@ announce(){
 	fi
 	screen -S DST_Master -p 0 -X stuff "c_announce(\"$1\")$(printf \\r)"
 	echo -e "\e[92m信息已发送√ \e[0m"
-}
-
-# 重置
-reset(){
-	del $1
-	start $1
-	# if [[ $Master_live > 0 ]]; then
-	#     screen -S "DST_Master" -p 0 -X stuff "c_regenerateworld()$(printf \\r)"
-	# fi
-	# if [[ $Caves_live > 0 ]]; then
-	#     screen -S "DST_Caves" -p 0 -X stuff "c_regenerateworld()$(printf \\r)"
-	# fi
-	# echo "\e[35m正在重置当前世界。。。请稍候。。。\e[0m"
 }
 
 
@@ -435,8 +440,8 @@ main(){
 		echo -e "\e[1;32m 2. \e[0m 停止游戏进程"
 		echo -e "\e[1;32m 3. \e[0m 重启游戏进程,可以用来更新mod"
 		echo -e "\e[1;32m 4. \e[0m 饥荒游戏服务器版本更新"                                                                                             
-		echo -e "\e[1;32m 5. \e[0m 删除服务器游戏记录存档"
-		echo -e "\e[1;32m 6. \e[0m 重置饥荒服务器,将删除游戏存档记录"
+		echo -e "\e[1;32m 5. \e[0m 删除服务器游戏存档"
+		echo -e "\e[1;32m 6. \e[0m 重置饥荒服务器,将删除游戏存档"
 		echo -e "\e[32m PS:\e[0m (选项加 0或1可以单独操作地上或洞穴,如:10 启动地上)"
 		
 		echo -e "\e[36m----饥荒服务器状态-----\e[0m"
@@ -444,8 +449,9 @@ main(){
 		echo -e "\e[36m-----------------------\e[0m"
 		
 		if [[ $Master_live > 0 ]];then
-			read -p "是否获取世界和玩家信息? [y/n] " c
-			if [[ $c != n ]];then
+			read -p "服务器运行中,是否获取世界和玩家信息? [y/n] " -n 1
+			echo ""
+			if [[ $REPLY =~ ^[Yy]$ ]];then
 				serverinfo
 			fi
 		fi
@@ -510,7 +516,7 @@ main(){
 		61 ) reset 1
 			;;
 		rb ) read -p "请输入你要回档的天数(1~5): " rollbackday
-			rollback 
+			rollback $rollbackday
 			;;
 		rg ) regenerate
 			;;
