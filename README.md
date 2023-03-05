@@ -45,6 +45,7 @@ cd DST-Server-Build&&sudo chmod +x dst-go.sh&&./dst-go.sh
     -- cluster_token.txt --klei私人账户token
     -- mods_setup.lua --mod下载列表文件
     -- mods_enable.lua --mod启用与否文件
+    -- *.txt  --管理员，黑/白 名单
 
     /Master
         --server.ini --地上配置
@@ -70,4 +71,4 @@ cd DST-Server-Build&&sudo chmod +x dst-go.sh&&./dst-go.sh
 
 ### Other
 
-饥荒游戏 Server[微信测试公众号管理](https://github.com/qwertyuiop6/wx-dst-admin)
+饥荒游戏服务器[网站/微信号管理](https://github.com/qwertyuiop6/wx-dst-admin)

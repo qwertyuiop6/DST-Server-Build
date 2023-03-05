@@ -15,10 +15,6 @@ if [ `screen -ls | grep -c Dead` -gt 0 ]
 	then screen -wipe 
 fi
 
-Master_live=`screen -ls | grep -c DST_Master`
-Caves_live=`screen -ls | grep -c DST_Caves`
-
-dst_live=($Master_live $Caves_live)
 
 # 查看状态
 status(){
@@ -48,6 +44,7 @@ stop(){
 	if [[ ${dst_live[$1]} -gt 0 ]];then
 		screen -S DST_${dst_name[$1]} -p 0 -X stuff "c_shutdown()$(printf \\r)"
 		echo  -e "\e[32m ##: ${dst_zh[$1]}已停止... \e[0m"
+		sleep 2s
 		cp ${dst_dir[$1]}/server_chat_log.txt ${dst_dir[$1]}/chat.txt.tmp		
 	else
 		echo  -e "\e[32m ${dst_zh[$1]}状态:关闭 \e[0m"
@@ -56,6 +53,7 @@ stop(){
 # 重启
 restart(){
 	stop $1
+	update_status
 	start $1
 }
 
@@ -69,6 +67,7 @@ reset(){
 	fi
 
 	del $1
+	update_status
 	start $1
 	# if [[ $Master_live > 0 ]]; then
 	#     screen -S "DST_Master" -p 0 -X stuff "c_regenerateworld()$(printf \\r)"
@@ -122,6 +121,8 @@ updst(){
 	fi
 
 	ln -f $modlink $modlua
+
+	update_status
 
 	if [ $1 ];then
 		start $1
@@ -254,74 +255,6 @@ getworldstate(){
 		    presentsnow="无雪"
 		fi
 	fi
-	# if [[ $Master_live = 0 && $Caves_live > 0 ]]; then						        
-	# 	datatime=$( date +%s%3N )	
-	# 	screen -S "DST_Caves" -p 0 -X stuff "print(\"\" .. TheWorld.net.components.seasons:GetDebugString() .. \" $datatime print\")$(printf \\r)"
-	# 	screen -S "DST_Caves" -p 0 -X stuff "print(\"\" .. TheWorld.components.worldstate.data.phase .. \" $datatime phase\")$(printf \\r)"
-	# 	screen -S "DST_Caves" -p 0 -X stuff "print(\"\" .. TheWorld.components.worldstate.data.moonphase .. \" $datatime moonphase\")$(printf \\r)"
-	# 	screen -S "DST_Caves" -p 0 -X stuff "print(TheWorld.components.worldstate.data.temperature .. \" $datatime temperature\")$(printf \\r)"
-	# 	screen -S "DST_Caves" -p 0 -X stuff "print(TheWorld.components.worldstate.data.cycles .. \" $datatime cycles\")$(printf \\r)"
-	# 	screen -S "DST_Caves" -p 0 -X stuff "print(\"$datatime:rain:\",TheWorld.components.worldstate.data.israining)$(printf \\r)"
-	# 	screen -S "DST_Caves" -p 0 -X stuff "print(\"$datatime:snow:\",TheWorld.components.worldstate.data.issnowing)$(printf \\r)"
-	# 	sleep 1
-	#     presentseason=$( grep "$cluster/Caves/server_log.txt" -e "$datatime print" | cut -d ' ' -f2 | tail -n +2 )
-	# 	presentday=$( grep "$cluster/Caves/server_log.txt" -e "$datatime print" | cut -d ' ' -f3 | tail -n +2 )
-	# 	presentphase=$( grep "$cluster/Caves/server_log.txt" -e "$datatime phase" | cut -d ' ' -f2 | tail -n +2 )
-	# 	presentmoonphase=$( grep "$cluster/Caves/server_log.txt" -e "$datatime moonphase" | cut -d ' ' -f2 | tail -n +2 )
-	# 	presenttemperature=$( grep "$cluster/Caves/server_log.txt" -e "$datatime temperature" | cut -d ' ' -f2 | tail -n +2 )
-	# 	presentrain=$( grep "$cluster/Caves/server_log.txt" -e "$datatime:rain" | cut -d ':' -f6 | tail -n +2 )
-	# 	presentsnow=$( grep "$cluster/Caves/server_log.txt" -e "$datatime:snow" | cut -d ':' -f6 | tail -n +2 | cut -d ' ' -f2 )
-	# 	presentcycles=$( grep "$cluster/Caves/server_log.txt" -e "$datatime cycles" | cut -d ' ' -f2 | tail -n +2 )
-		
-	# 	if [[ "$presentseason" == "autumn" ]]; then
-	# 	    presentseason="秋天"
-	# 	fi
-	# 	if [[ "$presentseason" == "spring" ]]; then
-	# 	    presentseason="春天"
-	# 	fi
-	# 	if [[ "$presentseason" == "summer" ]]; then
-	# 	    presentseason="夏天"
-	# 	fi
-	# 	if [[ "$presentseason" == "winter" ]]; then
-	# 	    presentseason="冬天"
-	# 	fi
-		
-	# 	if [[ "$presentphase" == "day" ]]; then
-	# 	    presentphase="白天"
-	# 	fi
-	# 	if [[ "$presentphase" == "dusk" ]]; then
-	# 	    presentphase="黄昏"
-	# 	fi
-	# 	if [[ "$presentphase" == "night" ]]; then
-	# 	    presentphase="黑夜"
-	# 	fi
-		
-	# 	if [[ "$presentmoonphase" == "new" ]]; then
-	# 	    presentmoonphase="新月"
-	# 	fi
-	# 	if [[ "$presentmoonphase" == "full" ]]; then
-	# 	    presentmoonphase="满月"
-	# 	fi
-	# 	if [[ "$presentmoonphase" == "threequarter" || "$presentmoonphase" == "quarter" || "$presentmoonphase" == "half" ]]; then
-	# 	    presentmoonphase="缺月"
-	# 	fi
-		
-	# 	presenttemperature=${presenttemperature%.*}
-		
-	# 	if [[ $( echo "$presentrain" | grep -c "true" ) > 0 ]]; then
-	# 	    presentrain="下雨"
-	# 	fi
-	# 	if [[ $( echo "$presentrain" | grep -c "false" ) > 0 ]]; then
-	# 	    presentrain="无雨"
-	# 	fi
-		
-	# 	if [[ $( echo "$presentsnow" | grep -c "true" ) > 0 ]]; then
-	# 	    presentsnow="下雪"
-	# 	fi
-	# 	if [[ $( echo "$presentsnow" | grep -c "false" ) > 0 ]]; then
-	# 	    presentsnow="无雪"
-	# 	fi
-	# fi
 	
 }
 getworldname(){
@@ -350,12 +283,6 @@ getplayernumber(){
 	    sleep 1
 	    number=$( grep $master_log -e "$allplayersnumber" | cut -f3 -d ' ' | tail -n +2 )
 	fi
-	# if [[ $Master_live = 0 && $Caves_live > 0 ]]; then
-	#     allplayersnumber=$( date +%s%3N )
-	#     screen -S "DST_Caves" -p 0 -X stuff "print(\"AllPlayersNumber \" .. (table.getn(TheNet:GetClientTable())-1) .. \" $allplayersnumber\")$(printf \\r)"
-	#     sleep 1
-	# 	number=$( grep "$cluster/Caves/server_log.txt" -e "$allplayersnumber" | cut -f3 -d ' ' | tail -n +2 )
-	# fi
 }
 getplayerlist(){
 	if [ $Master_live -gt 0 ] ;then
@@ -367,19 +294,6 @@ getplayerlist(){
 				echo $playerlist > $cluster/playerlist.txt
 			fi
 	fi
-	# if [[ $Master_live = 0 && $Caves_live > 0 ]]; then	    
-	#     allplayerslist=$( date +%s%3N )
-	# 	screen -S "DST_Caves" -p 0 -X stuff "for i, v in ipairs(TheNet:GetClientTable()) do  print(string.format(\"playerlist %s [%d] %s %s %s\", $allplayerslist, i-1, v.userid, v.name, v.prefab)) end$(printf \\r)"
-    #     sleep 1
-    #     list=$( grep "${DST_conf_basedir}/${DST_conf_dirname}/$cluster/Caves/server_log.txt" -e "playerlist $allplayerslist" | cut -d ' ' -f 4-15 | tail -n +2)
-	# 	if [[ ! "$list" = "" ]]; then
-	# 	    echo -e "\e[92m服务器玩家列表：\e[0m"
-	#         echo -e "\e[92m================================================================================\e[0m"
-	# 	echo "$list"
-	# 	echo -e "\e[92m================================================================================\e[0m"
-	# 		echo "$list" > $HOME/.klei/playerlist.txt
-	# 	fi
-	# fi
 }
 
 serverinfo(){
@@ -431,8 +345,13 @@ checkserver(){
 	fi
 }
 
+update_status(){
+	Master_live=`screen -ls | grep -c DST_Master`
+	Caves_live=`screen -ls | grep -c DST_Caves`
+	dst_live=($Master_live $Caves_live)
+}
 main(){
-
+	update_status
 	if [ $# -eq 0 ];then
 		echo -e "\e[22;42;30m ###====[ Don't Starve Togther 管理控制台 [v$local_v] ]====### \e[0m"
 		echo -e "\e[1;32m 0. \e[0m 查看游戏服务器"
