@@ -66,7 +66,8 @@ cp -r mods ~/dst
 ln -f $DST/mods_enable.lua $DST/Master/modoverrides.lua
 ln -f $DST/mods_enable.lua $DST/Caves/modoverrides.lua
 ln ~/dst/mods/dedicated_server_mods_setup.lua $DST/mods_setup.lua
-ln $DST/customcommands.lua $DST/Master/ $DST/Caves/
+ln $DST/customcommands.lua $DST/Master/customcommands.lua
+ln $DST/customcommands.lua $DST/Caves/customcommands.lua
 
 #配置个人token
 echo -en "\033[32m请输入您的私人饥荒token,回车确认:\033[0m"
