@@ -8,11 +8,6 @@
 
 [Klei guide](http://dont-starve-game.wikia.com/wiki/Guides/Don%E2%80%99t_Starve_Together_Dedicated_Servers)
 
-#### My article
-
-> DST-Server 饥荒服务搭建详细教程:
-> [Click me](https://blog.wtfk.fun/2017/11/02/my-first-article/)
-
 ## DST Server 快速搭建
 
 #### 1. 获取本项目代码
@@ -34,7 +29,7 @@ unzip master.zip&&mv DST-Server-Build-master DST-Server-Build&&rm master.zip
 #### 2. 赋权并运行
 
 ```shell
-cd DST-Server-Build&&sudo chmod +x dst-go.sh&&./dst-go.sh
+cd DST-Server-Build&&sudo chmod +x setup.sh&&./setup.sh
 ```
 
 #### 3. 编辑各项游戏的配置,地图，mod 文件
@@ -57,17 +52,11 @@ cd DST-Server-Build&&sudo chmod +x dst-go.sh&&./dst-go.sh
 
 #### 4. 运行 DST Server 日常管理命令: `dst`
 
-按照提示输入数字指令操作游戏服务器
+![](img/dst-admin.png)
 
-- 0 : 查看游戏服务器状态
-- 1 : 启动地上+洞穴游戏进程
-- 2 : 停止游戏进程
-- 3 : 重启游戏进程,可以用来更新 mod
-- 4 : 更新饥荒游戏服务器版本
-- 5 : 删除服务器保存的游戏存档,日志等
-- 6 : 重置饥荒游戏服务器,将删除游戏存档记录
+按照提示输入选项操作游戏服务器
 
-> 可在选项后增加一位数字 0 或 1,单独操作地上或洞穴游戏进程,如　 10: 启动地上
+> 可在数字选项后增加一位数字 0 或 1,单独操作地上或洞穴游戏进程,如　 10: 启动地上
 
 ### Other
 
