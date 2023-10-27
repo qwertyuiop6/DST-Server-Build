@@ -19,9 +19,9 @@ fi
 # 查看状态
 status() {
 	if [[ ${dst_live[$1]} > 0 ]]; then
-		echo -e "\e[36m ${dst_zh[$1]}:⭐ 运行中 ⭐ \e[0m"
+		echo -e "\e[36m ${dst_zh[$1]}: ⭐ 运行中 ⭐ \e[0m"
 	else
-		echo -e "\e[31m ${dst_zh[$1]}:❌ 关闭 ❌\e[0m"
+		echo -e "\e[31m ${dst_zh[$1]}: x 关闭 x\e[0m"
 	fi
 }
 
@@ -31,10 +31,10 @@ start() {
 	if [[ ${dst_live[$1]} -eq 0 ]]; then
 		screen -S "DST_${dst_name[$1]}" -dm sh ${dst_sh[$1]}.sh && if [[ $(echo $?) -eq 0 ]]; then
 			[ -f ${dst_dir[$1]}/chat.txt.tmp ] && mv ${dst_dir[$1]}/chat.txt.tmp ${dst_dir[$1]}/server_chat_log.txt
-			echo -e "\e[36m ##: ${dst_zh[$1]}启动成功~ \e[0m"
+			echo -e "\e[36m # ${dst_zh[$1]}启动成功~ \e[0m"
 		fi
 	else
-		echo -e "\e[31m !!!${dst_zh[$1]}正在运行中!!! \e[0m"
+		echo -e "\e[32m ${dst_zh[$1]}已经在运行中~ \e[0m"
 	fi
 }
 
@@ -42,11 +42,22 @@ start() {
 stop() {
 	if [[ ${dst_live[$1]} -gt 0 ]]; then
 		screen -S DST_${dst_name[$1]} -p 0 -X stuff "c_shutdown()$(printf \\r)"
-		echo -e "\e[32m ##: ${dst_zh[$1]}已停止... \e[0m"
-		sleep 2s
+		dots=""
+		count=0
+		while [ $(screen -ls | grep -c DST_${dst_name[$1]}) -gt 0 ]; do
+			echo -en "\e[32m ${dst_zh[$1]}正在关闭中$dots \e[0m \r"
+			sleep 0.5
+			count=$((count + 1))
+			dots=$(printf "%${count}s" | tr ' ' '.')
+			if [ $count -eq 3 ]; then
+				count=0
+			fi
+		done
+		echo -ne "\r\e[K"
+		echo -e "\e[32m # ${dst_zh[$1]}已停止 √ \e[0m"
 		cp ${dst_dir[$1]}/server_chat_log.txt ${dst_dir[$1]}/chat.txt.tmp
 	else
-		echo -e "\e[32m ${dst_zh[$1]}状态:关闭 \e[0m"
+		echo -e "\e[32m ${dst_zh[$1]}状态: 关闭 \e[0m"
 	fi
 }
 # 重启
@@ -268,9 +279,9 @@ getplayerlist() {
 		screen -S DST_Master -p 0 -X stuff "for i, v in ipairs(TheNet:GetClientTable()) do  print(string.format(\"playerlist %s %d. ID:[%s] 玩家:\\\\\e[36m[%s]\\\\\e[0m 角色:%s\", $allplayerslist, i-1, v.userid, v.name, v.prefab )) end$(printf \\r)"
 		sleep 1
 		playerlist=$(grep $master_log -e "playerlist $allplayerslist" | cut -d ' ' -f 4-15 | tail -n +2)
-		if [ ! $Master_live = "" ]; then
-			echo $playerlist >$cluster/playerlist.txt
-		fi
+		# if [ ! $Master_live = "" ]; then
+		# 	echo $playerlist >$cluster/playerlist.txt
+		# fi
 	fi
 }
 
