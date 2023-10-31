@@ -123,14 +123,21 @@ updst() {
 	start 1
 }
 
+#保存
+save() {
+	screen -S "DST_Master" -p 0 -X stuff "c_save()$(printf \\r)"
+	echo -e "\e[32m已保存√\e[0m"
+}
+
 #回档
 rollback() {
 	if [ $Master_live -eq 0 ]; then
-		echo -n "---------服务器关闭中----------"
-		return
+		echo "---------服务器关闭中----------"
+		return 1
 	fi
 	if [ ! $1 ]; then
-		return
+		echo "缺少回档天数"
+		return 1
 	fi
 	if [[ $Master_live > 0 ]]; then
 		screen -S "DST_Master" -p 0 -X stuff "c_rollback($rollbackday)$(printf \\r)"
@@ -144,8 +151,8 @@ rollback() {
 #重新生成世界
 regenerate() {
 	if [ $Master_live -eq 0 ]; then
-		echo -n "---------服务器关闭中----------"
-		return
+		echo "---------服务器关闭中----------"
+		return 1
 	fi
 	now=$(date '+%Y-%m-%d')
 	cp -r $cluster ${servers}/${now}.regen.bak
@@ -156,8 +163,12 @@ regenerate() {
 #公告
 announce() {
 	if [ $Master_live -eq 0 ]; then
-		echo -e "---------服务器关闭中----------"
-		return
+		echo "---------服务器关闭中----------"
+		return 1
+	fi
+	if [ ! $1 ]; then
+		echo "缺少公告内容"
+		return 1
 	fi
 	screen -S DST_Master -p 0 -X stuff "c_announce(\"$1\")$(printf \\r)"
 	echo -e "\e[92m信息已发送√ \e[0m"
@@ -286,7 +297,11 @@ getplayerlist() {
 }
 
 serverinfo() {
-	echo -e "\e[35m请稍等,正在获取世界和玩家信息........\e[0m"
+	if [ $Master_live -eq 0 ]; then
+		echo -e "---------服务器关闭中----------"
+		return 1
+	fi
+	echo -en "\e[35m请稍等,正在获取世界和玩家信息.......\e[0m \r"
 
 	getworldname
 	getworldstate
@@ -314,17 +329,17 @@ serverinfo() {
 checkserver() {
 	screen -ls
 	if [[ $Master_live > 0 || $Caves_live > 0 ]]; then
-		echo -e "\e[36m 即将进入世界控制台.....\e[0m"
-		sleep 1
+		echo -e "\e[36m即将进入世界控制台..... 按住\e[32m Ctrl + A + D \e[0m\e[36m即可脱离\e[0m"
+		sleep 1.5
 		if [[ $Master_live > 0 ]]; then
 			screen -r DST_Master
 		else
 			screen -r DST_Caves
 		fi
 	else
-		echo -e "\e[31m !!!游戏服务器尚未开启!!! \e[0m"
+		echo -e "\e[31m !!!游戏服务器尚未启动!!! \e[0m"
 		sleep 2
-		main
+		return 1
 	fi
 }
 
@@ -334,32 +349,12 @@ update_status() {
 	dst_live=($Master_live $Caves_live)
 }
 
-main() {
+exe() {
+	local code=0
 	update_status
+
 	if [ $# -eq 0 ]; then
-		echo -e "\e[22;42;30m ###====[ Don't Starve Togther 管理控制台 [ \e[1;37mv$local_v\e[0m\e[22;42;30m ] ]====### \e[0m"
-		# echo -e "\e[1;32m 0 \e[0m 查看游戏服务器"
-		echo -e "[\e[1;32m 1 \e[0m] 启动游戏服务器           [\e[1;32m 2 \e[0m] 停止游戏进程"
-		echo -e "[\e[1;32m 3 \e[0m] 重启游戏进程(可更新mod)  [\e[1;32m 4 \e[0m] 删除服务器游戏存档"
-		echo -e "[\e[1;32m 5 \e[0m] 重置饥荒服务器,将删除游戏存档"
-
-		echo -e "[\e[1;36m up \e[0m] 饥荒游戏服务器版本更新  [\e[1;36m rb \e[0m] 游戏服务器世界回档"
-		echo -e "[\e[1;36m rg \e[0m] 游戏世界重新生成        [\e[1;36m an \e[0m] 公告发送喊话通知"
-		echo -e "[\e[1;36m x \e[0m] 切换到游戏输出控制台"
-		echo -e "PS: 数字选项加 0或1可以单独操作地上或洞穴, 如\e[1;32m 10 \e[0m即启动地上"
-		echo ""
-		echo -e "\e[96m----饥荒服务器运行状态-----\e[0m"
-		main 0
-		echo -e "\e[96m-------------------------\e[0m"
-
-		if [[ $Master_live > 0 ]]; then
-			read -p "服务器运行中,是否获取世界和玩家信息? [y/n] " -n 1
-			echo ""
-			if [[ $REPLY =~ ^[Yy]$ ]]; then
-				serverinfo
-			fi
-		fi
-		read -p "输入选项,回车确认操作: " choose
+		read -p "输入执行选项, 回车确认操作: " choose
 	else
 		choose=$1
 	fi
@@ -445,17 +440,60 @@ main() {
 		read -p "请输入公告内容: " announcement
 		announce $announcement
 		;;
+	ls)
+		serverinfo
+		;;
 	x)
 		checkserver
-		main
+		;;
+	q)
+		echo -e "\e[1;32mBye ~ \e[0m"
+		exit 0
 		;;
 	*)
 		echo -e "\e[1;31m请输入正确的指令!! \e[0m"
-		main
+		echo 1 >/dev/null
 		;;
 	esac
+
+	code=$?
+	if [ $# -gt 0 ]; then
+		return $code
+	fi
+
+	sleep 0.5
+	exe
 }
 
+# main
 type dst-v >/dev/null 2>&1 && (dst-v -s &) || $script_dir/dst-v.sh -s &
+# main $@
 
-main $@
+if [ $# -gt 0 ]; then
+	exe $@
+	exit $?
+fi
+echo -e "\e[22;42;30m ##====[ Don't Starve Togther 管理控制台 <\e[1;37mv$local_v\e[0m\e[22;42;30m> ]====## \e[0m"
+echo -e "[\e[1;32m 1 \e[0m] 启动游戏服务器            [\e[1;32m 2 \e[0m] 停止游戏进程"
+echo -e "[\e[1;32m 3 \e[0m] 重启游戏进程(可更新mod)   [\e[1;32m 4 \e[0m] 删除服务器游戏存档"
+echo -e "[\e[1;32m 5 \e[0m] 重置饥荒服务器,将删除游戏存档"
+
+echo -e "[\e[1;36m up \e[0m] 饥荒游戏服务器版本更新   [\e[1;36m rb \e[0m] 游戏服务器世界回档"
+echo -e "[\e[1;36m rg \e[0m] 游戏世界地图重新生成     [\e[1;36m an \e[0m] 公告发送喊话通知"
+echo -e "[\e[1;36m ls \e[0m] 查看服务器内玩家列表"
+echo -e "[\e[1;33m x \e[0m] 切换到游戏进程控制台      [\e[1;31m q \e[0m] 退出"
+echo -e "PS: 数字选项加 0或1可以单独操作地上或洞穴, 如\e[1;32m 10 \e[0m即启动地上"
+echo ""
+echo -e "\e[96m----饥荒服务器运行状态-----\e[0m"
+exe 0
+echo -e "\e[96m-------------------------\e[0m"
+
+if [[ $Master_live > 0 ]]; then
+	read -p "服务器运行中,是否获取世界和玩家信息? [y/n] " -n 1
+	echo ""
+	if [[ $REPLY =~ ^[Yy]$ ]]; then
+		serverinfo
+	fi
+fi
+
+exe
