@@ -41,7 +41,7 @@ create_cluster() {
 
 DST="$HOME/.klei/DoNotStarveTogether/$cluster"
 if [ -d $DST ]; then
-    read -p "存档已经存在$DST,你是要创建新存档吗? 输入[ y: 创建新存档 n: 更新服务器]:" -n 1
+    read -p "存档${cluster}已经存在,你是要创建新存档吗? 输入[ y: 创建新存档 n: 更新服务器]:" -n 1
     echo ""
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         read -p "\e[32m请输入您要创建的存档名称,回车确认:\e[0m" newcluster
@@ -57,12 +57,12 @@ fi
 #为世界建立快速启动的shell脚本
 if [ -n $new_cluster ]; then
     cd $dst_install/bin
-    if [ ! -f $dst_install/bin/overworld.sh ]; then
-        #分别为地上,洞穴建立快速启动的shell脚本
-        echo ./dontstarve_dedicated_server_nullrenderer -console -cluster MyDediServer -shard Master >overworld.sh
-        echo ./dontstarve_dedicated_server_nullrenderer -console -cluster MyDediServer -shard Caves >cave.sh
-        chmod +x overworld.sh cave.sh
-    fi
+    # if [ ! -f $dst_install/bin/overworld.sh ]; then
+    #分别为地上,洞穴建立快速启动的shell脚本
+    echo ./dontstarve_dedicated_server_nullrenderer -console -cluster '$1' -shard Master >overworld.sh
+    echo ./dontstarve_dedicated_server_nullrenderer -console -cluster '$1' -shard Caves >cave.sh
+    chmod +x overworld.sh cave.sh
+    # fi
 fi
 
 #---------复制必要文件配置和创建token----------

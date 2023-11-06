@@ -1,6 +1,34 @@
 #!/bin/bash
+dst_install=$HOME/dst
 servers="$HOME/.klei/DoNotStarveTogether"
-cluster="$servers/MyDediServer"
+
+cluster_names=$(find $servers -maxdepth 1 -mindepth 1 -type d)
+cluster_count=$(find $servers -maxdepth 1 -mindepth 1 -type d | wc -l)
+
+if [ $cluster_count -eq 1 ]; then
+	cluster_name=$cluster_names
+else
+	for folder in $cluster_names; do
+		c=$(basename $folder)
+		if [ -z $first ]; then
+			first=$c
+		fi
+		echo $c
+	done
+	echo -e "\033[32m请输入您要操作的存档名称(默认为\033[36m $first \033[0m\033[32m),回车确认:\033[0m"
+	read cluster_name
+	if [ -z $cluster_name ]; then
+		cluster_name=$first
+	fi
+
+fi
+
+cluster="$servers/$cluster_name"
+if [ ! -d $cluster ]; then
+	echo -e "\e[1;31m请输入正确的存档名称!! \e[0m"
+	exit 1
+fi
+
 master="$cluster/Master"
 cave="$cluster/Caves"
 
@@ -9,7 +37,7 @@ dst_name=("Master" "Caves")
 dst_zh=("地上" "洞穴")
 dst_sh=("overworld" "cave")
 
-local_v=$(cat ~/dst/version.txt)
+local_v=$(cat $dst_install/version.txt)
 script_dir="$(dirname "$(readlink -f "$0")")"
 
 if [ $(screen -ls | grep -c Dead) -gt 0 ]; then
@@ -29,7 +57,7 @@ status() {
 start() {
 	cd ~/dst/bin
 	if [[ ${dst_live[$1]} -eq 0 ]]; then
-		screen -S "DST_${dst_name[$1]}" -dm sh ${dst_sh[$1]}.sh && if [[ $(echo $?) -eq 0 ]]; then
+		screen -S "DST_${cluster_name}_${dst_name[$1]}" -dm sh ${dst_sh[$1]}.sh ${cluster_name} && if [[ $(echo $?) -eq 0 ]]; then
 			[ -f ${dst_dir[$1]}/chat.txt.tmp ] && mv ${dst_dir[$1]}/chat.txt.tmp ${dst_dir[$1]}/server_chat_log.txt
 			echo -e "\e[36m # ${dst_zh[$1]}启动成功~ \e[0m"
 		fi
@@ -41,10 +69,10 @@ start() {
 # 停止
 stop() {
 	if [[ ${dst_live[$1]} -gt 0 ]]; then
-		screen -S DST_${dst_name[$1]} -p 0 -X stuff "c_shutdown()$(printf \\r)"
+		screen -S DST_${cluster_name}_${dst_name[$1]} -p 0 -X stuff "c_shutdown()$(printf \\r)"
 		dots=""
 		count=0
-		while [ $(screen -ls | grep -c DST_${dst_name[$1]}) -gt 0 ]; do
+		while [ $(screen -ls | grep -c DST_${cluster_name}_${dst_name[$1]}) -gt 0 ]; do
 			echo -en "\e[32m ${dst_zh[$1]}正在关闭中$dots \e[0m \r"
 			sleep 0.5
 			count=$((count + 1))
@@ -107,13 +135,13 @@ updst() {
 	cp $dir/server_chat_log.txt $dir/chat.txt.tmp
 
 	modlink="$cluster/mods_setup.lua"
-	modlua="$HOME/dst/mods/dedicated_server_mods_setup.lua"
+	modlua="$dst_install/mods/dedicated_server_mods_setup.lua"
 
 	[ -f $modlink ] || ln $modlua $modlink
 
-	steamcmd +force_install_dir $HOME/dst +login anonymous +app_update 343050 validate +quit
+	steamcmd +force_install_dir $dst_install +login anonymous +app_update 343050 validate +quit
 	if [[ $(echo $?) -eq 0 ]]; then
-		echo -e "\e[36m ⭐饥荒游戏版本更新成功 version:[$(cat $HOME/dst/version.txt)] ⭐ \e[0m"
+		echo -e "\e[36m ⭐饥荒游戏版本更新成功 version:[$(cat $dst_install/version.txt)] ⭐ \e[0m"
 	fi
 
 	ln -f $modlink $modlua
@@ -125,7 +153,7 @@ updst() {
 
 #保存
 save() {
-	screen -S "DST_Master" -p 0 -X stuff "c_save()$(printf \\r)"
+	screen -S "$Master_Process" -p 0 -X stuff "c_save()$(printf \\r)"
 	echo -e "\e[32m已保存√\e[0m"
 }
 
@@ -140,10 +168,10 @@ rollback() {
 		return 1
 	fi
 	if [[ $Master_live > 0 ]]; then
-		screen -S "DST_Master" -p 0 -X stuff "c_rollback($rollbackday)$(printf \\r)"
+		screen -S "$Master_Process" -p 0 -X stuff "c_rollback($rollbackday)$(printf \\r)"
 	fi
 	if [[ $Caves_live > 0 ]]; then
-		screen -S "DST_Caves" -p 0 -X stuff "c_rollback($rollbackday)$(printf \\r)"
+		screen -S "DST_${cluster_name}_Caves" -p 0 -X stuff "c_rollback($rollbackday)$(printf \\r)"
 	fi
 	echo -e "\e[32m 已回档$rollbackday 天!\e[0m"
 }
@@ -156,7 +184,7 @@ regenerate() {
 	fi
 	now=$(date '+%Y-%m-%d')
 	cp -r $cluster ${servers}/${now}.regen.bak
-	screen -S DST_Master -p 0 -X stuff "c_regenerateworld()$(printf \\r)"
+	screen -S $Master_Process -p 0 -X stuff "c_regenerateworld()$(printf \\r)"
 	# screen -S DST_${dst_name[$1]} -p 0 -X stuff "c_regenerateworld()$(printf \\r)"
 }
 
@@ -170,7 +198,7 @@ announce() {
 		echo "缺少公告内容"
 		return 1
 	fi
-	screen -S DST_Master -p 0 -X stuff "c_announce(\"$1\")$(printf \\r)"
+	screen -S $Master_Process -p 0 -X stuff "c_announce(\"$1\")$(printf \\r)"
 	echo -e "\e[92m信息已发送√ \e[0m"
 }
 
@@ -186,13 +214,13 @@ getworldstate() {
 
 	if [[ $Master_live > 0 ]]; then
 		datatime=$(date +%s%3N)
-		screen -S DST_Master -p 0 -X stuff "print(\"\" .. TheWorld.net.components.seasons:GetDebugString() .. \" $datatime print\")$(printf \\r)"
-		screen -S DST_Master -p 0 -X stuff "print(\"\" .. TheWorld.components.worldstate.data.phase .. \" $datatime phase\")$(printf \\r)"
-		screen -S DST_Master -p 0 -X stuff "print(\"\" .. TheWorld.components.worldstate.data.moonphase .. \" $datatime moonphase\")$(printf \\r)"
-		screen -S DST_Master -p 0 -X stuff "print(TheWorld.components.worldstate.data.temperature .. \" $datatime temperature\")$(printf \\r)"
-		screen -S DST_Master -p 0 -X stuff "print(TheWorld.components.worldstate.data.cycles .. \" $datatime cycles\")$(printf \\r)"
-		screen -S DST_Master -p 0 -X stuff "print(\"$datatime:rain:\",TheWorld.components.worldstate.data.israining)$(printf \\r)"
-		screen -S DST_Master -p 0 -X stuff "print(\"$datatime:snow:\",TheWorld.components.worldstate.data.issnowing)$(printf \\r)"
+		screen -S $Master_Process -p 0 -X stuff "print(\"\" .. TheWorld.net.components.seasons:GetDebugString() .. \" $datatime print\")$(printf \\r)"
+		screen -S $Master_Process -p 0 -X stuff "print(\"\" .. TheWorld.components.worldstate.data.phase .. \" $datatime phase\")$(printf \\r)"
+		screen -S $Master_Process -p 0 -X stuff "print(\"\" .. TheWorld.components.worldstate.data.moonphase .. \" $datatime moonphase\")$(printf \\r)"
+		screen -S $Master_Process -p 0 -X stuff "print(TheWorld.components.worldstate.data.temperature .. \" $datatime temperature\")$(printf \\r)"
+		screen -S $Master_Process -p 0 -X stuff "print(TheWorld.components.worldstate.data.cycles .. \" $datatime cycles\")$(printf \\r)"
+		screen -S $Master_Process -p 0 -X stuff "print(\"$datatime:rain:\",TheWorld.components.worldstate.data.israining)$(printf \\r)"
+		screen -S $Master_Process -p 0 -X stuff "print(\"$datatime:snow:\",TheWorld.components.worldstate.data.issnowing)$(printf \\r)"
 
 		# sleep 1
 
@@ -279,7 +307,7 @@ getplayernumber() {
 	# number=0
 	if [[ $Master_live > 0 ]]; then
 		allplayersnumber=$(date +%s%3N)
-		screen -S DST_Master -p 0 -X stuff "print(\"AllPlayersNumber \" .. (table.getn(TheNet:GetClientTable())-1) .. \" $allplayersnumber\")$(printf \\r)"
+		screen -S $Master_Process -p 0 -X stuff "print(\"AllPlayersNumber \" .. (table.getn(TheNet:GetClientTable())-1) .. \" $allplayersnumber\")$(printf \\r)"
 		sleep 1
 		number=$(grep $master_log -e "$allplayersnumber" | cut -f3 -d ' ' | tail -n +2)
 	fi
@@ -287,7 +315,7 @@ getplayernumber() {
 getplayerlist() {
 	if [ $Master_live -gt 0 ]; then
 		allplayerslist=$(date +%s%3N)
-		screen -S DST_Master -p 0 -X stuff "for i, v in ipairs(TheNet:GetClientTable()) do  print(string.format(\"playerlist %s %d. ID:[%s] 玩家:\\\\\e[36m[%s]\\\\\e[0m 角色:%s\", $allplayerslist, i-1, v.userid, v.name, v.prefab )) end$(printf \\r)"
+		screen -S $Master_Process -p 0 -X stuff "for i, v in ipairs(TheNet:GetClientTable()) do  print(string.format(\"playerlist %s %d. ID:[%s] 玩家:\\\\\e[36m[%s]\\\\\e[0m 角色:%s\", $allplayerslist, i-1, v.userid, v.name, v.prefab )) end$(printf \\r)"
 		sleep 1
 		playerlist=$(grep $master_log -e "playerlist $allplayerslist" | cut -d ' ' -f 4-15 | tail -n +2)
 		# if [ ! $Master_live = "" ]; then
@@ -332,9 +360,9 @@ checkserver() {
 		echo -e "\e[36m即将进入世界控制台..... 按住\e[32m Ctrl + A + D \e[0m\e[36m即可脱离\e[0m"
 		sleep 1.5
 		if [[ $Master_live > 0 ]]; then
-			screen -r DST_Master
+			screen -r $Master_Process
 		else
-			screen -r DST_Caves
+			screen -r DST_${cluster_name}_Caves
 		fi
 	else
 		echo -e "\e[31m !!!游戏服务器尚未启动!!! \e[0m"
@@ -344,8 +372,9 @@ checkserver() {
 }
 
 update_status() {
-	Master_live=$(screen -ls | grep -c DST_Master)
-	Caves_live=$(screen -ls | grep -c DST_Caves)
+	Master_Process=DST_${cluster_name}_Master
+	Master_live=$(screen -ls | grep -c DST_${cluster_name}_Master)
+	Caves_live=$(screen -ls | grep -c DST_${cluster_name}_Caves)
 	dst_live=($Master_live $Caves_live)
 }
 
